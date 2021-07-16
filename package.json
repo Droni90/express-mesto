@@ -20,9 +20,12 @@
   },
   "homepage": "https://github.com/Droni90/express-mesto#readme",
   "dependencies": {
+    "body-parser": "^1.19.0",
     "eslint-config-airbnb-base": "^14.2.1",
     "eslint-plugin-import": "^2.23.4",
     "express": "^4.17.1",
+    "mongodb": "^4.0.0",
+    "mongoose": "^5.13.2",
     "nodemon": "^2.0.12",
     "prettier": "^2.3.2"
   },
