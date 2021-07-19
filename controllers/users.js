@@ -5,11 +5,11 @@ module.exports.getUsers = (req, res) => {
     .then((users) => res.send({ data: users }))
     .catch((err) => res.status(500).send({ message: err.message }));
 };
-// module.exports.getUser = (req, res) => {
-//   User.find({})
-//     .then((users) => res.send({ data: users }))
-//     .catch((err) => res.status(500).send({ message: err.message }));
-// };
+module.exports.getUser = (req, res) => {
+  User.findById(req.params._id)
+    .then((users) => res.send({ data: users }))
+    .catch((err) => res.status(500).send({ message: err.message }));
+};
 
 module.exports.createUser = (req, res) => {
   const { name, about, avatar } = req.body;

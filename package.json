@@ -1,35 +1,32 @@
 {
   "name": "express-mesto",
   "version": "1.0.0",
-  "description": "`/routes` — папка с файлами роутера  \r `/controllers` — папка с файлами контроллеров пользователя и карточки   \r `/models` — папка с файлами описания схем пользователя и карточки",
-  "main": "index.js",
+  "description": "Project express-mesto for YP",
+  "main": "app.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "lint": "npx eslint",
+    "lint": "npx eslint .",
     "start": "node app.js",
     "dev": "nodemon app.js"
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/Droni90/express-mesto.git"
+    "url": "git+https://github.com/yandex-praktikum/express-mesto.git"
   },
-  "author": "",
+  "author": "Kerjanoid",
   "license": "ISC",
   "bugs": {
-    "url": "https://github.com/Droni90/express-mesto/issues"
+    "url": "https://github.com/yandex-praktikum/express-mesto/issues"
   },
-  "homepage": "https://github.com/Droni90/express-mesto#readme",
+  "homepage": "https://github.com/yandex-praktikum/express-mesto#readme",
   "dependencies": {
-    "body-parser": "^1.19.0",
-    "eslint-config-airbnb-base": "^14.2.1",
-    "eslint-plugin-import": "^2.23.4",
     "express": "^4.17.1",
-    "mongodb": "^4.0.0",
-    "mongoose": "^5.13.2",
-    "nodemon": "^2.0.12",
-    "prettier": "^2.3.2"
+    "mongoose": "^5.13.2"
   },
   "devDependencies": {
-    "eslint": "^7.30.0"
+    "eslint": "^7.2.0",
+    "eslint-config-airbnb": "^18.2.1",
+    "eslint-plugin-import": "^2.23.4",
+    "nodemon": "^2.0.10"
   }
 }
