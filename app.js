@@ -14,17 +14,14 @@ mongoose.connect("mongodb://localhost:27017/mestodb", {
 });
 app.use((req, res, next) => {
   req.user = {
-    _id: "60f5e52149570c42b84973da",
+    _id: "60f6a9d967edd30944611c81",
   };
 
   next();
 });
 
 app.use("/", require("./routes/user"));
-
-app.get("/", (req, res) => {
-  res.send("Hello!");
-});
+app.use("/", require("./routes/card"));
 
 app.listen(PORT, () => {
   console.log(`Example app listening at http://localhost:${PORT}`);
