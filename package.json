@@ -21,6 +21,7 @@
   "homepage": "https://github.com/yandex-praktikum/express-mesto#readme",
   "dependencies": {
     "express": "^4.17.1",
+    "helmet": "^4.6.0",
     "mongoose": "^5.13.2"
   },
   "devDependencies": {

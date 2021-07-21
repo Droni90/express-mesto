@@ -12,7 +12,8 @@ module.exports.getUsers = (req, res) => {
 };
 
 module.exports.getUser = (req, res) => {
-  User.findById(req.params._id).orFail(new Error("NotFound"))
+  User.findById(req.params._id)
+    .orFail(new Error("NotFound"))
     .then((user) => res.send({ data: user }))
     .catch((err) => {
       if (err.name === "CastError") {
@@ -40,7 +41,12 @@ module.exports.createUser = (req, res) => {
 
 module.exports.updateUser = (req, res) => {
   const { name, about } = req.body;
-  User.findByIdAndUpdate(req.user._id, { name, about })
+  User.findByIdAndUpdate(req.user._id,
+    { name, about },
+    {
+      runValidators: true,
+      new: true,
+    })
     .then((user) => res.send({ data: user }))
     .catch((err) => {
       if (err.name === "CastError") {
@@ -55,7 +61,11 @@ module.exports.updateUser = (req, res) => {
 
 module.exports.updateAvatar = (req, res) => {
   const { avatar } = req.body;
-  User.findByIdAndUpdate(req.user._id, { avatar })
+  User.findByIdAndUpdate(req.user._id, { avatar },
+    {
+      runValidators: true,
+      new: true,
+    })
     .then((user) => res.send({ data: user }))
     .catch((err) => {
       if (err.name === "CastError") {

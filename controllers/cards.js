@@ -26,11 +26,16 @@ module.exports.createCard = (req, res) => {
 
 module.exports.deleteCard = (req, res) => {
   Card.findByIdAndRemove(req.params._id)
+    .orFail(new Error("NotFound"))
     .then((card) => res.send({ data: card }))
     .catch((err) => {
+      if (err.name === "CastError") {
+        return res.status(400).send({ message: "Ошибка в запросе" });
+      }
       if (err.message === "NotFound") {
         return res.status(404).send({ message: "Карточка с указанным _id не найдена" });
       }
+
       return res.status(500).send({ message: "Ошибка на сервере" });
     });
 };
