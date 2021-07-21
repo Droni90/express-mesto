@@ -20,6 +20,9 @@ module.exports.createCard = (req, res) => {
       if (err.name === "CastError") {
         return res.status(400).send({ message: "Переданы некорректные данные при создании карточки" });
       }
+      if (err.name === "ValidationError") {
+        res.status(400).send({ message: "Переданы некорректные данные при создании карточки." });
+      }
       return res.status(500).send({ message: "Ошибка на сервере" });
     });
 };
@@ -43,6 +46,7 @@ module.exports.deleteCard = (req, res) => {
 module.exports.likeCard = (req, res) => {
   Card.findByIdAndUpdate(req.params._id, { $addToSet: { likes: req.user._id } },
     { new: true })
+    .orFail(new Error("NotFound"))
     .then((card) => res.send({ data: card }))
     .catch((err) => {
       if (err.name === "CastError") {
@@ -57,6 +61,7 @@ module.exports.likeCard = (req, res) => {
 module.exports.dislikeCard = (req, res) => {
   Card.findByIdAndUpdate(req.params._id, { $pull: { likes: req.user._id } },
     { new: true })
+    .orFail(new Error("NotFound"))
     .then((card) => res.send({ data: card }))
     .catch((err) => {
       if (err.name === "CastError") {

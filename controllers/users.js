@@ -35,6 +35,9 @@ module.exports.createUser = (req, res) => {
       if (err.name === "CastError") {
         return res.status(400).send({ message: "Переданы некорректные данные при создании" });
       }
+      if (err.name === "ValidationError") {
+        res.status(400).send({ message: "Переданы некорректные данные при создании карточки." });
+      }
       return res.status(500).send({ message: "Ошибка на сервере" });
     });
 };
