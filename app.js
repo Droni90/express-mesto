@@ -1,7 +1,9 @@
 const express = require("express");
 const mongoose = require("mongoose");
 const helmet = require("helmet");
+const { celebrate, Joi } = require("celebrate");
 const { createUser, login } = require("./controllers/users");
+const auth = require("./middlewares/auth");
 
 const { PORT = 3000 } = process.env;
 const app = express();
@@ -17,11 +19,19 @@ mongoose.connect("mongodb://localhost:27017/mestodb", {
   useUnifiedTopology: true,
 });
 
-app.use("/", require("./routes/user"));
-app.use("/", require("./routes/card"));
-
+app.post("/signup", celebrate({
+  body: Joi.object().keys({
+    name: Joi.string().min(2).max(30),
+    about: Joi.string().min(2).max(30),
+    avatar: Joi.string(),
+    email: Joi.string().email().required(),
+    password: Joi.string().required().min(8).max(35),
+  }),
+}), createUser);
 app.post("/signin", login);
-app.post("/signup", createUser);
+
+app.use("/users", auth, require("./routes/user"));
+app.use("/cards", auth, require("./routes/card"));
 
 app.use("*", (req, res) => {
   res.status(404).send({ message: "Запрашиваемый ресурс не найден" });
