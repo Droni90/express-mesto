@@ -46,21 +46,23 @@ module.exports.createUser = (req, res) => {
   const {
     name, about, avatar, email, password,
   } = req.body;
-  bcrypt.hash(password, 10)
-    .then((hash) => User.create({
-      name,
-      about,
-      avatar,
-      email,
-      password: hash,
-    })
-      .then((user) => res.send({ data: user }))
+
+  User.findOne({ email }).then((us) => {
+    if (us) {
+      throw new Error("Пользователь с таким email уже существует");
+    }
+    bcrypt.hash(password, 10)
+      .then((hash) => User.create({
+        name, about, avatar, email, password: hash,
+      }))
+      .then((user) => res.status(201).send({ _id: user._id, email: user.email }))
       .catch((err) => {
         if (err.name === "ValidationError") {
           return res.status(400).send({ message: "Переданы некорректные данные при создании" });
         }
         return res.status(500).send({ message: "Ошибка на сервере" });
-      }));
+      });
+  });
 };
 
 module.exports.updateUser = (req, res) => {
