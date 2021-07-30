@@ -1,6 +1,6 @@
 const mongoose = require("mongoose");
 const bcrypt = require("bcryptjs");
-const { isEmail } = require("validator");
+const validator = require("validator");
 const Unauthorized = require("../errors/Unauthorized");
 
 const userSchema = new mongoose.Schema({
@@ -19,14 +19,20 @@ const userSchema = new mongoose.Schema({
   avatar: {
     type: String,
     default: "https://pictures.s3.yandex.net/resources/jacques-cousteau_1604399756.png",
+    validate: {
+      validator(url) {
+        return /https?:\/\/[\w-]+.[a-z.]+[\/*[a-z#]+]?/gim.test(url);
+      },
+      message: "Неккоректный url адрес",
+    },
   },
   email: {
     type: String,
     unique: [true, "Пользователь с таким 'email' уже существует."],
     required: [true, "Поле 'email' должно быть заполнено."],
     validate: {
-      validator: (v) => isEmail(v),
-      message: "Неправильный формат почты.",
+      validator: (v) => validator.isEmail(v),
+      message: "Некорректный Email",
     },
   },
   password: {
@@ -34,6 +40,16 @@ const userSchema = new mongoose.Schema({
     minlength: [8, "Минимальная длина поля 'password' - 8 символов."],
     required: [true, "Поле 'password' должно быть заполнено."],
     select: false,
+    validate: {
+      validator(password) {
+        return validator.isStrongPassword(password,
+          {
+            minUppercase: false,
+            minSymbols: false,
+          });
+      },
+      message: "Ненадежный пароль",
+    },
   },
 });
 
