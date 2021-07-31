@@ -8,7 +8,7 @@ const Conflict = require("../errors/Conflict");
 module.exports.getUsers = (req, res, next) => {
   User.find({})
     .then((users) => res.send({ data: users }))
-    .catch((err) => next(err.message));
+    .catch((err) => next(err));
 };
 
 module.exports.getUser = (req, res, next) => {
@@ -24,7 +24,7 @@ module.exports.getUser = (req, res, next) => {
       if (err.name === "CastError") {
         next(new BadRequest("Запрашиваемый пользователь не найден"));
       }
-      next(err.message);
+      next(err);
     });
 };
 
@@ -36,7 +36,7 @@ module.exports.getMe = (req, res, next) => {
       }
       return next(new NotFound("Пользователь не существует"));
     })
-    .catch((err) => next(err.message));
+    .catch((err) => next(err));
 };
 
 module.exports.createUser = (req, res, next) => {
@@ -57,7 +57,7 @@ module.exports.createUser = (req, res, next) => {
         if (err.name === "ValidationError") {
           next(new BadRequest("Переданы некорректные данные при создании"));
         }
-        next(err.message);
+        next(err);
       });
   });
 };
@@ -80,7 +80,7 @@ module.exports.updateUser = (req, res, next) => {
       if (err.name === "CastError") {
         next(new BadRequest("Переданы некорректные данные при обновлении профиля"));
       }
-      next(err.message);
+      next(err);
     });
 };
 
@@ -101,29 +101,31 @@ module.exports.updateAvatar = (req, res, next) => {
       if (err.name === "CastError") {
         next(new BadRequest("Переданы некорректные данные при обновлении аватара"));
       }
-      next(err.message);
+      next(err);
     });
 };
 
 module.exports.login = (req, res, next) => {
   const { email, password } = req.body;
 
-  return User.findUserByCredentials(email, password, next)
+  User.findOne({ email }).select("+password")
+    .orFail(new Error("IncorrectEmail"))
     .then((user) => {
-      const token = jwt.sign({ _id: user._id }, "super-strong-secret", { expiresIn: "7d" });
-      req.cookie("jwt", token, {
-        maxAge: 3600000 * 24 * 7,
-        httpOnly: true,
-        sameSite: true,
-      });
-      res.status(200).send({
-        token: req.cookie.jwt,
-      });
+      bcrypt.compare(password, user.password)
+        .then((matched) => {
+          if (!matched) {
+            next(new BadRequest("Указан некорректный Email или пароль."));
+          } else {
+            const token = jwt.sign({ _id: user._id }, "super-strong-secret", { expiresIn: "7d" });
+            res.status(201).send({ token });
+          }
+        });
     })
     .catch((err) => {
-      if (err.name === "ValidationError") {
-        next(new BadRequest("Переданы некорректные данные при входе"));
+      if (err.message === "IncorrectEmail") {
+        next(new BadRequest("Указан некорректный Email или пароль."));
+      } else {
+        next(err);
       }
-      next(err.message);
     });
 };

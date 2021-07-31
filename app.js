@@ -31,8 +31,8 @@ app.post("/signup", celebrate({
 }), createUser);
 app.post("/signin", login);
 
-app.use("/users", auth, require("./routes/user"));
-app.use("/cards", auth, require("./routes/card"));
+app.use("/", auth, require("./routes/user"));
+app.use("/", auth, require("./routes/card"));
 
 app.use("*", (req, res, next) => {
   next(new NotFound("Запрашиваемый ресурс не найден"));
