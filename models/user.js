@@ -1,7 +1,5 @@
 const mongoose = require("mongoose");
-const bcrypt = require("bcryptjs");
-const validator = require("validator");
-const Unauthorized = require("../errors/Unauthorized");
+const { isEmail, isURL, isStrongPassword } = require("validator");
 
 const userSchema = new mongoose.Schema({
   name: {
@@ -20,9 +18,7 @@ const userSchema = new mongoose.Schema({
     type: String,
     default: "https://pictures.s3.yandex.net/resources/jacques-cousteau_1604399756.png",
     validate: {
-      validator(url) {
-        return /https?:\/\/[\w-]+.[a-z.]+[\/*[a-z#]+]?/gim.test(url);
-      },
+      validator: (v) => isURL(v),
       message: "Неккоректный url адрес",
     },
   },
@@ -31,7 +27,7 @@ const userSchema = new mongoose.Schema({
     unique: [true, "Пользователь с таким 'email' уже существует."],
     required: [true, "Поле 'email' должно быть заполнено."],
     validate: {
-      validator: (v) => validator.isEmail(v),
+      validator: (v) => isEmail(v),
       message: "Некорректный Email",
     },
   },
@@ -42,7 +38,7 @@ const userSchema = new mongoose.Schema({
     select: false,
     validate: {
       validator(password) {
-        return validator.isStrongPassword(password,
+        return isStrongPassword(password,
           {
             minUppercase: false,
             minSymbols: false,
@@ -52,22 +48,5 @@ const userSchema = new mongoose.Schema({
     },
   },
 });
-
-// userSchema.statics.findUserByCredentials = function findUserByCredentials(email, password, next) {
-//   return this.findOne({ email }).select("+password")
-//     .then((user) => {
-//       if (!user) {
-//         return next(new Unauthorized("Неправильные почта или пароль"));
-//       }
-
-//       return bcrypt.compare(password, user.password)
-//         .then((matched) => {
-//           if (!matched) {
-//             return next(new Unauthorized("Неправильные почта или пароль"));
-//           }
-//           return user;
-//         });
-//     });
-// };
 
 module.exports = mongoose.model("user", userSchema);

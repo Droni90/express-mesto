@@ -4,6 +4,7 @@ const User = require("../models/user");
 const NotFound = require("../errors/NotFound");
 const BadRequest = require("../errors/BadRequest");
 const Conflict = require("../errors/Conflict");
+const Unauthorized = require("../errors/Unauthorized");
 
 module.exports.getUsers = (req, res, next) => {
   User.find({})
@@ -21,6 +22,9 @@ module.exports.getUser = (req, res, next) => {
       return next(new NotFound("Пользователь не существует"));
     })
     .catch((err) => {
+      if (err.name === "NotFound") {
+        next(new NotFound("пользователь с указанным _id не найдена"));
+      }
       if (err.name === "CastError") {
         next(new BadRequest("Запрашиваемый пользователь не найден"));
       }
@@ -114,7 +118,7 @@ module.exports.login = (req, res, next) => {
       bcrypt.compare(password, user.password)
         .then((matched) => {
           if (!matched) {
-            next(new BadRequest("Указан некорректный Email или пароль."));
+            next(new Unauthorized("Указан некорректный Email или пароль."));
           } else {
             const token = jwt.sign({ _id: user._id }, "super-strong-secret", { expiresIn: "7d" });
             res.status(201).send({ token });
@@ -123,7 +127,7 @@ module.exports.login = (req, res, next) => {
     })
     .catch((err) => {
       if (err.message === "IncorrectEmail") {
-        next(new BadRequest("Указан некорректный Email или пароль."));
+        next(new Unauthorized("Указан некорректный Email или пароль."));
       } else {
         next(err);
       }

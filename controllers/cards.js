@@ -1,4 +1,5 @@
 const BadRequest = require("../errors/BadRequest");
+const NotFound = require("../errors/NotFound");
 const Card = require("../models/card");
 
 module.exports.getCards = (req, res, next) => {
@@ -30,6 +31,9 @@ module.exports.deleteCard = (req, res, next) => {
     .orFail(new Error("NotFound"))
     .then((card) => res.send({ data: card }))
     .catch((err) => {
+      if (err.name === "NotFound") {
+        next(new NotFound("Карточка с указанным _id не найдена"));
+      }
       if (err.name === "CastError") {
         next(new BadRequest("Карточка с указанным _id не найдена"));
       }
@@ -43,6 +47,9 @@ module.exports.likeCard = (req, res, next) => {
     .orFail(new Error("NotFound"))
     .then((card) => res.send({ data: card }))
     .catch((err) => {
+      if (err.name === "NotFound") {
+        next(new NotFound("Карточка с указанным _id не найдена"));
+      }
       if (err.name === "CastError") {
         next(new BadRequest("Переданы некорректные данные для постановки лайка."));
       }
@@ -55,6 +62,9 @@ module.exports.dislikeCard = (req, res, next) => {
     .orFail(new Error("NotFound"))
     .then((card) => res.send({ data: card }))
     .catch((err) => {
+      if (err.name === "NotFound") {
+        next(new NotFound("Карточка с указанным _id не найдена"));
+      }
       if (err.name === "CastError") {
         next(new BadRequest("Переданы некорректные данные для снятии лайка."));
       }
